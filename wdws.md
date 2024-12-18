@@ -69,3 +69,45 @@
 
 This setup will forward traffic from IIS (port 80/443) to your Node.js app on port `3000`. 🚀
 
+
+
+If you want your Node.js app to be accessible at `http://<your-ip-address>/helloworld`, you can configure IIS to serve it under that specific path while keeping other apps on the same IP. Here's how:
+
+---
+
+### **Steps to Configure IIS for Subpath Access (`/helloworld`)**
+
+#### **1. Use the Existing IIS Website**
+Instead of creating a new site, add the Node.js app as a virtual directory or sub-application under your existing IIS website.
+
+1. Open **IIS Manager**.
+2. Navigate to your existing website (e.g., `Default Web Site`).
+3. **Add a Virtual Directory**:
+   - Right-click on the website and select **Add Virtual Directory**.
+   - **Alias**: Enter `helloworld` (this is the path in the URL).
+   - **Physical Path**: Set it to the folder where your Node.js app resides.
+   - Click **OK**.
+
+---
+
+#### **2. Set Up Reverse Proxy for `/helloworld`**
+1. Double-click **URL Rewrite** in the IIS site settings.
+2. Add a new **Inbound Rule**:
+   - Select **Blank Rule** and click **OK**.
+3. Configure the rule:
+   - **Condition**: Match requests starting with `/helloworld`.
+     - Click **Add Conditions** → `{REQUEST_URI}` → Match Pattern: `^/helloworld`.
+   - **Action**: Forward traffic to your Node.js app.
+     - **Action Type**: Redirect or Rewrite.
+     - **Rewrite URL**: `http://localhost:3000/{R:0}`.
+     - Check **Append Query String**.
+
+4. Save and Apply the Rule.
+
+---
+
+#### **3. Test Your Setup**
+- Restart IIS (`iisreset`).
+- Visit `http://<your-ip-address>/helloworld`. It should serve your Node.js app.
+
+---
