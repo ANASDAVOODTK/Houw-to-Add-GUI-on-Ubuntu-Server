@@ -25,6 +25,30 @@
    You should see the **IIS Default Welcome Page**, confirming that IIS is installed and running.
 
 
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <system.webServer>
+    <rewrite>
+      <rules>
+        <rule name="SPA Fallback" stopProcessing="true">
+          <match url=".*" />
+          <conditions logicalGrouping="MatchAll">
+            <!-- don’t rewrite if the request is for an actual file -->
+            <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" />
+            <!-- don’t rewrite if it’s for a real directory -->
+            <add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true" />
+            <!-- (optional) don’t rewrite API calls -->
+            <add input="{REQUEST_URI}" pattern="^/api" negate="true" />
+          </conditions>
+          <!-- rewrite everything else to index.html -->
+          <action type="Rewrite" url="/index.html" />
+        </rule>
+      </rules>
+    </rewrite>
+  </system.webServer>
+</configuration>
+
+
   Here is a **brief step-by-step guide** to expose your Node.js app on port `3000` using **IIS**:
 
 ---
